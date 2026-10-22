@@ -19,6 +19,11 @@ public class BookingService {
                     "Некорректный номер места: " + seatNumber);
         }
 
+        // НОВОЕ БИЗНЕС-ПРАВИЛО (Вариант 13): место 13 не бронируется
+        if (seatNumber == 13) {
+            throw new IllegalArgumentException("Место 13 не доступно для бронирования");
+        }
+
         if (!seatRepository.isSeatAvailable(flight, seatNumber)) {
             throw new IllegalStateException(
                     "Место " + seatNumber + " уже забронировано на рейс "

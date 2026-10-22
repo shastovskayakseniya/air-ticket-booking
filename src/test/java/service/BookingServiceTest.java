@@ -52,7 +52,6 @@ class BookingServiceTest {
         assertTrue(ex.getMessage().contains("уже забронировано"));
     }
 
-
     @Test
     @DisplayName("Подсчёт свободных мест уменьшается после бронирования")
     void testAvailableSeatsCount() {
@@ -63,5 +62,18 @@ class BookingServiceTest {
 
         service.bookSeat(anna, flight, 2);
         assertEquals(8, service.getAvailableSeatsCount(flight));
+    }
+
+    @Test
+    @DisplayName("Нельзя забронировать место номер 13")
+    void testCannotBookSeatThirteen() {
+        // Создаем рейс на 20 мест, чтобы 13-е место было в допустимом диапазоне
+        Flight bigFlight = new Flight("SU-9999", "Minsk", "Paris", 20);
+
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> service.bookSeat(ivan, bigFlight, 13)
+        );
+        assertTrue(ex.getMessage().contains("Место 13 не доступно"));
     }
 }
