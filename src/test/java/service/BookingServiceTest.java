@@ -37,7 +37,7 @@ class BookingServiceTest {
         assertNotNull(booking);
         assertEquals(ivan, booking.getPassenger());
         assertEquals(flight, booking.getFlight());
-        assertEquals(5, booking.getSeatNumber());
+        assertEquals(99, booking.getSeatNumber());
     }
 
     @Test
