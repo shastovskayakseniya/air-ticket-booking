@@ -47,7 +47,7 @@ class BookingServiceTest {
 
         IllegalStateException ex = assertThrows(
                 IllegalStateException.class,
-                () -> service.bookSeat(anna, flight, 5)
+                () -> service.bookSeat(anna, flight, 99)
         );
         assertTrue(ex.getMessage().contains("уже забронировано"));
     }
