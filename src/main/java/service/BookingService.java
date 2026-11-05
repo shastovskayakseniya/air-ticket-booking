@@ -61,7 +61,8 @@ public class BookingService {
         log.info("Запрос на отмену бронирования: рейс {}, место {}", flight.getFlightNumber(), seatNumber);
 
         if (seatRepository.isSeatAvailable(flight, seatNumber)) {
-            log.warn("Попытка отменить несуществующую бронь на рейс {}, место {}", flight.getFlightNumber(), seatNumber);
+            log.warn("Попытка отменить несуществующую бронь на рейс {}, место {}",
+                    flight.getFlightNumber(), seatNumber);
             throw new IllegalStateException("Бронь на место " + seatNumber + " не найдена");
         }
 
