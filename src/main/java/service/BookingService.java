@@ -19,7 +19,8 @@ public class BookingService {
 
     public Booking bookSeat(Passenger passenger, Flight flight, int seatNumber) {
         // INFO: Начало операции
-        log.info("Запрос на бронирование: пассажир {}, рейс {}, место {}", passenger.getName(), flight.getFlightNumber(), seatNumber);
+        log.info("INFO: Запрос на бронирование: пассажир {}, рейс {}, место {}",
+                passenger.getName(), flight.getFlightNumber(), seatNumber);
 
         if (seatNumber < 1 || seatNumber > flight.getTotalSeats()) {
             // ERROR: Некорректные данные
@@ -35,14 +36,16 @@ public class BookingService {
         if (!seatRepository.isSeatAvailable(flight, seatNumber)) {
             // WARN: Место занято (не критическая ошибка системы, но проблема для пользователя)
             log.warn("Место {} уже занято на рейсе {}", seatNumber, flight.getFlightNumber());
-            throw new IllegalStateException("Место " + seatNumber + " уже забронировано на рейс " + flight.getFlightNumber());
+            throw new IllegalStateException("Место " + seatNumber + " уже забронировано на рейс "
+                    + flight.getFlightNumber());
         }
 
         boolean alreadyBooked = seatRepository.findBookingsByFlight(flight).stream()
                 .anyMatch(b -> b.getPassenger().equals(passenger));
         if (alreadyBooked) {
             log.warn("Пассажир {} уже имеет бронь на рейс {}", passenger.getName(), flight.getFlightNumber());
-            throw new IllegalStateException("Пассажир " + passenger.getName() + " уже имеет бронь на рейс " + flight.getFlightNumber());
+            throw new IllegalStateException("Пассажир " + passenger.getName() + " уже имеет бронь на рейс "
+                    + flight.getFlightNumber());
         }
 
         Booking booking = new Booking(passenger, flight, seatNumber);
