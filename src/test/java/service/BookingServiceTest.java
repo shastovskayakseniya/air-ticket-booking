@@ -76,4 +76,21 @@ class BookingServiceTest {
         );
         assertTrue(ex.getMessage().contains("Место 13 не доступно"));
     }
+    @Test
+    @DisplayName("Успешная отмена бронирования")
+    void testCancelBooking() {
+        service.bookSeat(ivan, flight, 5);
+        assertEquals(9, service.getAvailableSeatsCount(flight));
+
+        service.cancelBooking(flight, 5); // Вызовет INFO в консоли
+        assertEquals(10, service.getAvailableSeatsCount(flight));
+    }
+
+    @Test
+    @DisplayName("Попытка отмены несуществующей брони")
+    void testCancelNonExistentBooking() {
+        assertThrows(IllegalStateException.class, () -> {
+            service.cancelBooking(flight, 8); // Вызовет WARN в консоли
+        });
+    }
 }

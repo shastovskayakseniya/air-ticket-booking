@@ -14,6 +14,13 @@ pipeline {
             }
         }
 
+        // НОВЫЙ ЭТАП
+        stage('Static Analysis') {
+            steps {
+                bat '"C:\\Program Files\\apache-maven-3.9.16\\bin\\mvn.cmd" checkstyle:check'
+            }
+        }
+
         stage('Test') {
             steps {
                 bat '"C:\\Program Files\\apache-maven-3.9.16\\bin\\mvn.cmd" test'
