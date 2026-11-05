@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import repository.SeatRepository;
 
 public class BookingService {
-    // 1. Создаем Logger для этого класса
+    //  Создаем Logger
     private static final Logger log = LoggerFactory.getLogger(BookingService.class);
 
     private final SeatRepository seatRepository;
@@ -56,13 +56,12 @@ public class BookingService {
         return booking;
     }
 
-    // НОВЫЙ МЕТОД: Отмена бронирования (Индивидуальное задание)
+    // НОВЫЙ МЕТОД: Отмена бронирования
     public void cancelBooking(Flight flight, int seatNumber) {
         log.info("Запрос на отмену бронирования: рейс {}, место {}", flight.getFlightNumber(), seatNumber);
 
         if (seatRepository.isSeatAvailable(flight, seatNumber)) {
-            log.warn("Попытка отменить несуществующую бронь на рейс {}, место {}",
-                    flight.getFlightNumber(), seatNumber);
+            log.warn("Попытка отменить несуществующую бронь на рейс {}, место {}", flight.getFlightNumber(), seatNumber);
             throw new IllegalStateException("Бронь на место " + seatNumber + " не найдена");
         }
 
