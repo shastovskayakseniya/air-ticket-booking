@@ -13,8 +13,6 @@ pipeline {
                 bat '"C:\\Program Files\\apache-maven-3.9.16\\bin\\mvn.cmd" compile'
             }
         }
-
-
         stage('Static Analysis') {
             steps {
                 bat '"C:\\Program Files\\apache-maven-3.9.16\\bin\\mvn.cmd" checkstyle:check'
