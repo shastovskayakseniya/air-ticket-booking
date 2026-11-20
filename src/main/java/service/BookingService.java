@@ -24,8 +24,7 @@ public class BookingService {
 
         if (seatNumber < 1 || seatNumber > flight.getTotalSeats()) {
             // ERROR: Некорректные данные
-            log.error("Ошибка бронирования: некорректный номер места {}", seatNumber);
-            throw new IllegalArgumentException("Некорректный номер места: " + seatNumber);
+            log.error("Ошибка бронирования: некорректный номер места {}", seatNumber); throw new IllegalArgumentException("Некорректный номер места: " + seatNumber);
         }
 
         if (seatNumber == 13) {
