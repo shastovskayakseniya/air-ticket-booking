@@ -1,5 +1,7 @@
 package service;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import model.Booking;
 import model.Flight;
 import model.Passenger;
@@ -8,66 +10,69 @@ import org.slf4j.LoggerFactory;
 import repository.SeatRepository;
 
 public class BookingService {
-    //  Создаем Logger
     private static final Logger log = LoggerFactory.getLogger(BookingService.class);
 
     private final SeatRepository seatRepository;
 
-    public BookingService(SeatRepository seatRepository) {
+    // --- МЕТРИКИ ---
+    private final Counter totalOps;
+    private final Counter successOps;
+    private final Counter errorOps;
+    private final Counter bookingCreated;
+    private final Counter bookingCancelled;
+
+    public BookingService(SeatRepository seatRepository, MeterRegistry registry) {
         this.seatRepository = seatRepository;
+
+        // Регистрируем метрики в системе
+        this.totalOps = registry.counter("application_operations_total");
+        this.successOps = registry.counter("application_operations_success_total");
+        this.errorOps = registry.counter("application_operations_error_total");
+        // Индивидуальные метрики
+        this.bookingCreated = registry.counter("booking_created_total");
+        this.bookingCancelled = registry.counter("booking_cancelled_total");
     }
 
     public Booking bookSeat(Passenger passenger, Flight flight, int seatNumber) {
-        // INFO: Начало операции
-        log.info("INFO: Запрос на бронирование: пассажир {}, рейс {}, место {}",
-                passenger.getName(), flight.getFlightNumber(), seatNumber);
+        totalOps.increment(); // Считаем операцию
 
-        if (seatNumber < 1 || seatNumber > flight.getTotalSeats()) {
-            // ERROR: Некорректные данные
-            log.error("Ошибка бронирования: некорректный номер места {}", seatNumber);
-            throw new IllegalArgumentException("Некорректный номер места: " + seatNumber);
-        }
-
-        if (seatNumber == 13) {
-            log.error("Ошибка бронирования: место 13 недоступно");
-            throw new IllegalArgumentException("Место 13 не доступно для бронирования");
+        log.info("INFO: Запрос на бронирование...");
+        if (seatNumber < 1 || seatNumber > flight.getTotalSeats() || seatNumber == 13) {
+            errorOps.increment(); // Ошибка
+            log.error("ERROR: Ошибка бронирования...");
+            throw new IllegalArgumentException("Некорректный номер места");
         }
 
         if (!seatRepository.isSeatAvailable(flight, seatNumber)) {
-            // WARN: Место занято (не критическая ошибка системы, но проблема для пользователя)
-            log.warn("Место {} уже занято на рейсе {}", seatNumber, flight.getFlightNumber());
-            throw new IllegalStateException("Место " + seatNumber + " уже забронировано на рейс "
-                    + flight.getFlightNumber());
-        }
-
-        boolean alreadyBooked = seatRepository.findBookingsByFlight(flight).stream()
-                .anyMatch(b -> b.getPassenger().equals(passenger));
-        if (alreadyBooked) {
-            log.warn("Пассажир {} уже имеет бронь на рейс {}", passenger.getName(), flight.getFlightNumber());
-            throw new IllegalStateException("Пассажир " + passenger.getName() + " уже имеет бронь на рейс "
-                    + flight.getFlightNumber());
+            errorOps.increment(); // Ошибка
+            log.warn("WARN: Место занято...");
+            throw new IllegalStateException("Место уже забронировано");
         }
 
         Booking booking = new Booking(passenger, flight, seatNumber);
         seatRepository.bookSeat(flight, booking);
 
-        // INFO: Успешное завершение
-        log.info("Бронирование успешно создано: место {}", seatNumber);
+        successOps.increment(); // Успех
+        bookingCreated.increment(); // Индивидуальная метрика создания
+        log.info("INFO: Бронирование создано");
         return booking;
     }
 
-    // НОВЫЙ МЕТОД: Отмена бронирования
     public void cancelBooking(Flight flight, int seatNumber) {
-        log.info("Запрос на отмену бронирования: рейс {}, место {}", flight.getFlightNumber(), seatNumber);
+        totalOps.increment(); // Считаем операцию
 
+        log.info("INFO: Запрос на отмену...");
         if (seatRepository.isSeatAvailable(flight, seatNumber)) {
-            log.warn("Поытка отменить несуществующую бронь на рейс {}, место {}",
-                    flight.getFlightNumber(), seatNumber);
-            throw new IllegalStateException("Бронь на место " + seatNumber + " не найдена");
+            errorOps.increment(); // Ошибка
+            log.warn("WARN: Попытка отменить несуществующую бронь...");
+            throw new IllegalStateException("Бронь не найдена");
         }
 
         seatRepository.cancelBooking(flight, seatNumber);
-        log.info("Бронирование на место {} успешно отменено", seatNumber);
+
+        successOps.increment(); // Успех
+        bookingCancelled.increment(); // Индивидуальная метрика отмены
+        log.info("INFO: Бронирование отменено");
     }
 
     public int getAvailableSeatsCount(Flight flight) {
