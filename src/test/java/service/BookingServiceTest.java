@@ -1,5 +1,5 @@
 package service;
-
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import model.Booking;
 import model.Flight;
 import model.Passenger;
@@ -22,7 +22,10 @@ class BookingServiceTest {
     @BeforeEach
     void setUp() {
         SeatRepository repository = new InMemorySeatRepository();
-        service = new BookingService(repository);
+        SimpleMeterRegistry registry = new SimpleMeterRegistry();
+
+        // Передаем ДВА аргумента в конструктор
+        service = new BookingService(repository, registry);
 
         flight = new Flight("SU-1234", "Moscow", "London", 10);
         ivan = new Passenger(1, "Ivan");
