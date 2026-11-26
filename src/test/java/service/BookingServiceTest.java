@@ -73,13 +73,13 @@ class BookingServiceTest {
         // Создаем рейс на 20 мест, чтобы 13-е место было в допустимом диапазоне
         Flight bigFlight = new Flight("SU-9999", "Minsk", "Paris", 20);
 
+        // Пытаемся забронировать 13-е место на ЭТОМ рейсе (bigFlight)
         IllegalArgumentException ex = assertThrows(
                 IllegalArgumentException.class,
-                // ОЧЕНЬ ВАЖНО: передаем bigFlight, а не flight!
                 () -> service.bookSeat(ivan, bigFlight, 13)
         );
 
-        // Проверяем текст ошибки
+        // Проверяем, что ошибка именно про 13-е место
         assertTrue(ex.getMessage().contains("Место 13 не доступно"));
     }
     @Test
