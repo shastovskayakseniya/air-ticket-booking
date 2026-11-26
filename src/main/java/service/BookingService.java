@@ -34,7 +34,8 @@ public class BookingService {
     }
 
     public Booking bookSeat(Passenger passenger, Flight flight, int seatNumber) {
-        log.info("INFO: Запрос на бронирование: пассажир {}, рейс {}, место {}", passenger.getName(), flight.getFlightNumber(), seatNumber);
+        log.info("INFO: Запрос на бронирование: пассажир {}, рейс {}, " +
+                "место {}", passenger.getName(), flight.getFlightNumber(), seatNumber);
 
         if (seatNumber < 1 || seatNumber > flight.getTotalSeats()) {
             log.error("ERROR: Ошибка бронирования: некорректный номер места {}", seatNumber);
@@ -49,7 +50,8 @@ public class BookingService {
 
         if (!seatRepository.isSeatAvailable(flight, seatNumber)) {
             log.warn("WARN: Место {} уже занято на рейсе {}", seatNumber, flight.getFlightNumber());
-            throw new IllegalStateException("Место " + seatNumber + " уже забронировано на рейс " + flight.getFlightNumber());
+            throw new IllegalStateException("Место " + seatNumber +
+                    " уже забронировано на рейс " + flight.getFlightNumber());
         }
 
         Booking booking = new Booking(passenger, flight, seatNumber);
