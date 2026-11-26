@@ -75,8 +75,11 @@ class BookingServiceTest {
 
         IllegalArgumentException ex = assertThrows(
                 IllegalArgumentException.class,
+                // ОЧЕНЬ ВАЖНО: передаем bigFlight, а не flight!
                 () -> service.bookSeat(ivan, bigFlight, 13)
         );
+
+        // Проверяем текст ошибки
         assertTrue(ex.getMessage().contains("Место 13 не доступно"));
     }
     @Test
