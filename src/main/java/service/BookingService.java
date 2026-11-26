@@ -34,19 +34,22 @@ public class BookingService {
     }
 
     public Booking bookSeat(Passenger passenger, Flight flight, int seatNumber) {
-        totalOps.increment(); // Считаем операцию
+        log.info("INFO: Запрос на бронирование: пассажир {}, рейс {}, место {}", passenger.getName(), flight.getFlightNumber(), seatNumber);
 
-        log.info("INFO: Запрос на бронирование...");
-        if (seatNumber < 1 || seatNumber > flight.getTotalSeats() || seatNumber == 13) {
-            errorOps.increment(); // Ошибка
-            log.error("ERROR: Ошибка бронирования...");
-            throw new IllegalArgumentException("Некорректный номер места");
+        if (seatNumber < 1 || seatNumber > flight.getTotalSeats()) {
+            log.error("ERROR: Ошибка бронирования: некорректный номер места {}", seatNumber);
+            throw new IllegalArgumentException("Некорректный номер места: " + seatNumber);
+        }
+
+        // НОВОЕ БИЗНЕС-ПРАВИЛО (Вариант 13)
+        if (seatNumber == 13) {
+            log.error("ERROR: Ошибка бронирования: место 13 недоступно");
+            throw new IllegalArgumentException("Место 13 не доступно для бронирования");
         }
 
         if (!seatRepository.isSeatAvailable(flight, seatNumber)) {
-            errorOps.increment(); // Ошибка
-            log.warn("WARN: Место занято...");
-            throw new IllegalStateException("Место уже забронировано");
+            log.warn("WARN: Место {} уже занято на рейсе {}", seatNumber, flight.getFlightNumber());
+            throw new IllegalStateException("Место " + seatNumber + " уже забронировано на рейс " + flight.getFlightNumber());
         }
 
         Booking booking = new Booking(passenger, flight, seatNumber);
