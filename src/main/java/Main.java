@@ -1,7 +1,6 @@
 import io.micrometer.prometheusmetrics.PrometheusConfig;
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry;
 import com.sun.net.httpserver.HttpServer;
-import model.Booking;
 import model.Flight;
 import model.Passenger;
 import repository.InMemorySeatRepository;
