@@ -40,9 +40,45 @@ public class Main {
 
         bookingService.bookSeat(ivan, flight, 5); // Успешно
         bookingService.bookSeat(ivan, flight, 6);
-        bookingService.bookSeat(ivan, flight, 7);// Новая операция
+        bookingService.bookSeat(ivan, flight, 7);
+        bookingService.bookSeat(ivan, flight, 8);
+        bookingService.bookSeat(ivan, flight, 9);
+        bookingService.bookSeat(ivan, flight, 10);
+        Passenger oleg = new Passenger(3, "Oleg");
+        Passenger olga = new Passenger(4, "Olga");
+        bookingService.bookSeat(ivan, flight, 4);
+        try {
+            bookingService.cancelBooking(flight, 9); // Пытаемся отменить то, чего нет
+        } catch (Exception e) {}
+
+        bookingService.cancelBooking(flight, 6);
+
+        try {
+            bookingService.cancelBooking(flight, 10); // Пытаемся отменить то, чего нет
+        } catch (Exception e) {}
+
         try { bookingService.cancelBooking(flight, 8); } catch (Exception e) {} // Ошибка
         bookingService.cancelBooking(flight, 5); // Успешно
+
+
+        Flight newFlight = new Flight("SU-9999", "Minsk", "Paris", 20);
+        Passenger maria = new Passenger(5, "Maria");
+        bookingService.bookSeat(maria, newFlight, 1);
+       // Passenger pavel = new Passenger(6, "Pavel");
+       // bookingService.bookSeat(pavel, newFlight, 2);
+
+
+
+        try {
+            bookingService.cancelBooking(newFlight, 15);
+        } catch (Exception e) {}
+
+        try {
+            bookingService.cancelBooking(newFlight, 16);
+        } catch (Exception e) {}
+
+
+
 
         System.out.println("Операции выполнены. Нажмите Enter для выхода...");
         System.in.read(); // Держим сервер запущенным
